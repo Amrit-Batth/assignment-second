@@ -1,0 +1,19 @@
+{
+  "name": "socialmediaservices",
+  "version": "1.0.0",
+  "description": "This is social media backend services like create,delete etc",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Amritpal Singh",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.2",
+    "mongoose": "^8.12.1",
+    "nodemon": "^3.1.9",
+    "socialmediaservices": "file:"
+  }
+}
