@@ -1,28 +1,24 @@
 import { Post } from "../models/post.model.js";
-
+import mongoose from 'mongoose';
 // Create Post
-const createPostService = async (param) => {
-    const newPost = new Post({
-        content: param.content,
-        media: param.media,
-        postedBy: param.postedBy,
-        visibility: param.visibility,  // Fixed typo
-        likes: param.likes || [],
-        comments: param.comments || [],
-        shares: param.shares || 0,
-        views: param.views || 0,
-        hashtags: param.hashtags || [],
-        mentions: param.mentions || [],
-    });
+const createPostService = async (data,auth) => {
+  
 
-    await newPost.save();
-    return newPost; // Added return statement
+        const newPost = new Post({
+            ...data,
+            postedBy :auth,
+        });
+
+        await newPost.save();
+        return newPost; // Added return statement
+   
 };
 
 // Get All Posts
-const getPostsService = async () => {
-    return await Post.find();
-};
+const getPostsService = async (sortOrder,limitQuery) => {
+    const sortValue = sortOrder === "asc" ? 1 : -1;
+    return await Post.find({}).sort({ createdAt: sortValue }).limit(limitQuery).populate('postedBy', 'name email bio');
+}; 
 
 // Get Post By ID
 const getPostByIdService = async (id) => {
@@ -35,8 +31,25 @@ const updatePostByIdService = async (id, data) => {
 };
 
 // Delete Post
-const deletePostByidService = async (id) => {
+const deletePostByIdService = async (id) => {
     return await Post.findByIdAndDelete(id);
 };
 
-export { createPostService, getPostsService, getPostByIdService, updatePostByIdService, deletePostByidService };
+// like post by user
+const postlike = async(id,userId)=>{
+    return await Post.findByIdAndUpdate(
+        id,
+        { $addToSet: { likes: userId } }, // Add user ID only if not already present
+        { new: true }
+    );   
+}
+// Add comment by user id
+const addCommentToPost = async (postId, userId, text) => {
+    return await Post.findByIdAndUpdate(
+        postId,
+        { $push: { comments: { userId, text } } }, // Push a new comment object
+        { new: true }
+    );
+};
+
+export { createPostService, getPostsService, getPostByIdService, updatePostByIdService, deletePostByIdService, postlike, addCommentToPost};

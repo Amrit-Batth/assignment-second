@@ -1,4 +1,4 @@
-import { createUserService, getUsersService, getUserByIdService, updateUserByIdService, deleteUserByIdService } from '../services/user.service.js';
+import { createUserService, getUsersService, getUserByIdService, updateUserByIdService, deleteUserByIdService,addFollower, removeFollower, findFollowers,getUsersServiceByEmail } from '../services/user.service.js';
 
 // Create User
 const createUserController = async (req, res) => {
@@ -17,12 +17,24 @@ const createUserController = async (req, res) => {
 const getUserController = async (req, res) => {
     try {
         const allUsers = await getUsersService();
+        
         res.status(200).json({ message: "Users retrieved successfully", users: allUsers });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 };
+// Get User by Email
+const getUserByEmailController = async(req,res)=>{
+    try {
+        const email = req.params.email;
+        const Users = await getUsersServiceByEmail(email);
+        // console.log(Users);
 
+        res.status(200).json({ message: "User retrieved successfully", users: Users });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}
 // Get User by ID
 const getUserByIdController = async (req, res) => {
     try {
@@ -65,4 +77,44 @@ const deleteUserByIdController = async (req, res) => {
     }
 };
 
-export { createUserController, getUserController, getUserByIdController, updateUserByIdController, deleteUserByIdController };
+// add follower
+const newFollowerAdd = async(req,res)=>{
+    try {
+        const{id : userId1}=req.params;
+        const{followerId : userId2}=req.body;
+
+        const newfollower = await addFollower(userId1,userId2);
+        res.status(200).json({message : newfollower});
+    
+    }catch(error) {
+        res.status(500).json({error : error})
+    }
+
+}
+
+// Remove Follower
+const followerRemove = async(req,res)=>{
+    try {
+        const{ id : userId1 } = req.params;
+        const { followerId : userId2 } = req.body;
+
+        const removedFollower = await removeFollower(userId1,userId2);
+        res.status(200).json({message : removedFollower})
+    }catch(error) {
+        res.status(500).json({error : error});
+    }
+};
+// Find-Followers
+const findFollowerController = async(req,res)=>{
+    try {
+        const{ id } = req.params;
+
+        const findFollowerss = await findFollowers(id);
+        res.status(200).json({message:"followers retrive successfully",findFollowerss});
+    }catch(error) {
+        res.status(500).json({error : error});
+    }    
+};
+// delete Many
+
+export { createUserController, getUserController, getUserByIdController, updateUserByIdController, deleteUserByIdController, newFollowerAdd, followerRemove, findFollowerController, getUserByEmailController};
